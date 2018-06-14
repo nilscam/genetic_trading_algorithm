@@ -92,6 +92,11 @@ class bollinger:
     def smoothing(self, x):
         return ((x ** 2 + 1) ** 0.5 - 1) / 2 + x
 
+    # softmax function implementation
+    def softmax(self, x):
+        e_x = np.exp(x - np.max(x))
+        return e_x / e_x.sum(axis=0)
+
     def process(self, marketplace):
         data_set = self.data[marketplace][-self.size:]
         mean = np.mean(data_set)

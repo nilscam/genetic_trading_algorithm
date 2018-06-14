@@ -3,6 +3,7 @@
 
 from bollinger import *
 import sys
+import math
 
 class wallet:
 
@@ -39,13 +40,24 @@ class wallet:
     def sellAll(self, marketplace):
         self.sell(self.__dict__[marketplace], marketplace)
 
+    # buy as many shares as possible for this price rounded up
+    def buyFor(self, maxMoney, marketplace):
+        if self.curPrice[marketplace] <= self.money:
+            if maxMoney > self.money:
+                maxMoney = self.money
+            nb = math.ceil(maxMoney / self.curPrice[marketplace])
+            if not nb == 1:
+                nb -= 1
+            self.buy(nb, marketplace)
+
+
 class trader:
 
     #genes d'un trader:
     # delta (0 / 5)
     # size (0 / 100)
     # multiplicateur de volatilité (0 / 1)
-    # multiplicateur de mise (0 / 1)
+    # mise par tour de jeu (0 / 1)
     # seuil d'achat (0 / 1)
     # seuil de vente (-1 / 0)
 
@@ -74,11 +86,11 @@ class trader:
             # interet que l'algo doit porter à ce marché
             attractiveness = self.bollinger.smoothing(risk * curstate)
 
-            #si le marché est haut dans les bandes de bollinger, je vend mes actions si attractiveness est inférieur à sellLimit
+            #si le marché est haut dans les bandes de bollinger, je vend mes actions si attractiveness est supérieur à sellLimit
             if attractiveness > 0:
                 if attractiveness > sellLimit:
                     self.wallet.sellAll(marketplace)
-            #sinon si le marché est en bas dans les bandes de bollinger, j'achète des actions si attractiveness est supérieur à buyLimit
+            #sinon si le marché est en bas dans les bandes de bollinger, j'achète des actions si attractiveness est inférieur à buyLimit
             elif
                 ratio[marketplace] = attractiveness
 
@@ -86,10 +98,16 @@ class trader:
         keys = []
         values = []
         for key, value in ratios.iteritems():
-            keys.append(key)
-            values.append(value)
-        updateRatios = dict(zip(keys, self.bollinger.softmax(values)))
+            if value < buyLimit:
+                keys.append(key)
+                values.append(value)
 
+        #buy actions
+        if values:
+            betRatios = dict(zip(keys, self.bollinger.softmax(values)))
+            toBet = self.wallet.money / self.bet
+            for key, value in betRatios.iteritems():
+                self.wallet.buyFor(toBet / value, key)
 
 
     def watch(self, nb):
