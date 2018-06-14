@@ -28,7 +28,10 @@ def GetValue(marketplace):
     return my_value
 
 def main():
-        algo()
+        if len(sys.argv) == 2 and sys.argv[1] == "test":
+                algo("test")
+        else:
+                algo("prod")
         sys.stdout.write("STATS\n")
         sys.stdout.flush()
         sys.stdout.write("EXIT\n")

@@ -2,23 +2,8 @@
 #-*- coding: utf-8 -*-
 
 from puller import *
+from bollinger import *
 import sys
-
-class marketplaceStats:
-    # max, min, median, linear_gradient
-    def __init__(self):
-        self.max = -99999999999
-        self.min = 99999999999
-
-class tradeAnalyzer:
-
-    def __init__(self):
-        self.data = {'crypto': [], 'forex': [], 'raw_material': [], 'stock_exchange': []}
-        
-
-    def feed(self, epoch):
-        
-    
 
 class wallet:
 
@@ -54,5 +39,19 @@ class wallet:
         self.curPrice = self.puller.pull()
 
 def algo():
+    #init variables
     w = wallet()
+    b = bollinger()
+
+    #loop algo
+
+    w.pull()
+    print (w.curPrice)
+    b.feed(w.curPrice)
+    w.pull()
+    print (w.curPrice)
+    b.feed(w.curPrice)
+    w.pull()
+    print (w.curPrice)
+    b.feed(w.curPrice)
     
