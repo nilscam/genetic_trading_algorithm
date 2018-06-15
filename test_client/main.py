@@ -34,8 +34,8 @@ def main():
                 algo("prod")
 
         #display earned money and leave
-        sys.stdout.write("STATS\n")
-        sys.stdout.flush()
+        #sys.stdout.write("STATS\n")
+        #sys.stdout.flush()
         sys.stdout.write("EXIT\n")
         sys.stdout.flush()
 

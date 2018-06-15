@@ -85,7 +85,7 @@ class bollinger:
     # e ^ (-x ^ 2)
     def calcCurRisk(self, bmin, bmax):
         res = bmin / bmax
-        return math.exp((res ** 2))
+        return math.exp((-res ** 2))
 
     # activation function to smooth result of market attractiveness
     # ((x ^ 2 + 1) ^ 0.5 - 1) / 2 + x

@@ -17,7 +17,7 @@ class wallet:
 
     def __str__(self):
         print("---Wallet:---")
-        print("Money: %d" % (self.money))
+        print("Money: %.3f" % (self.money))
         print("crypto: %d, estimated at %.3f" % (self.crypto, self.curPrice['crypto']))
         print("raw_material: %d, estimated at %.3f" % (self.raw_material, self.curPrice['raw_material']))
         print("forex: %d, estimated at %.3f" % (self.forex, self.curPrice['forex']))
@@ -71,7 +71,7 @@ class trader:
     # seuil d'achat (0 / 1)
     # seuil de vente (-1 / 0)
 
-    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.8, buyLimit = -0.9, sellLimit = 0.9):
+    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.5, buyLimit = -0.5, sellLimit = 0.5):
         self.risk = risk
         self.bet = bet
         self.buyLimit = buyLimit
@@ -103,6 +103,7 @@ class trader:
             #sinon si le marché est en bas dans les bandes de bollinger, j'achète des actions si attractiveness est inférieur à buyLimit
             elif attractiveness < self.buyLimit:
                 ratios[marketplace] = attractiveness
+            print ("curstate for %s is %.3f, risk = %.3f so attractiveness = %.3f " % (marketplace, curstate, risk, attractiveness))
 
         #softmax the list
         keys = []
