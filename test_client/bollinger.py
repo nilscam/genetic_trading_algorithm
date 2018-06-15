@@ -95,7 +95,7 @@ class puller:
     def pull(self):
         if self.wait_refresh():
             return {'crypto': -1}
-        time.sleep(0.01)
+        time.sleep(0.02)
         if (self.mode == "test"):
             return self.refreshDataTest()
         else:

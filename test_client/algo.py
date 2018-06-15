@@ -154,6 +154,7 @@ class trader:
 
     def update(self):
         curState = self.bollinger.pull()
+        eprint(curState)
         if curState['crypto'] == -1:
             return 0
         self.wallet.setCurPrice(curState)

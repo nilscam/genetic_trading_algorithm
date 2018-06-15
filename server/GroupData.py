@@ -57,7 +57,6 @@ class GroupData:
 
     def Buy(self, shares, marketplace):
         last_value = self.GetValue(marketplace)
-        print ("---Buying---")
 
         # Shares ok ?
         if shares <= 0:
@@ -74,15 +73,12 @@ class GroupData:
             print(StatusCode.failure.get(400))
             return
 
-        print ("buy %d shares at %.3f price -> total cost = %.3f" % (shares, last_value, shares * last_value))
         # Buy
         self.BalanceAccount(shares, marketplace, last_value, -1)
         print(StatusCode.success.get(200))
-        print ("cur money = %.3f" % self.current_money)
 
     def Sell(self, shares, marketplace):
         last_value = self.GetValue(marketplace)
-        print ("---Selling---")
 
         # Shares ok ?
         if shares <= 0:
@@ -101,12 +97,10 @@ class GroupData:
                     print(StatusCode.failure.get(402))
                     return
 
-        print ("sell %d shares at %.3f price -> total cost = %.3f" % (shares, last_value, shares * last_value))
 
         # Sell
         self.BalanceAccount(shares, marketplace, last_value, 1)
         print(StatusCode.success.get(200))
-        print ("cur money = %.3f" % self.current_money)
 
     def Dump(self):
         print('marketplace;shares')
