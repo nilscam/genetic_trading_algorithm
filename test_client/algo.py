@@ -71,7 +71,7 @@ class trader:
     # seuil d'achat (0 / 1)
     # seuil de vente (-1 / 0)
 
-    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.5, buyLimit = -0.5, sellLimit = 0.5):
+    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.8, buyLimit = -0.9, sellLimit = 0.9):
         self.risk = risk
         self.bet = bet
         self.buyLimit = buyLimit
