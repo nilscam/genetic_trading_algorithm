@@ -33,18 +33,30 @@ class wallet:
     def buy(self, nb, marketplace):
         price = self.getPrice(nb, marketplace)
         if price <= self.money:
+            print ("---Buying---")
+
             print("BUY:%d:%s" % (nb, marketplace), flush=True)
+
+            print ("sell %d %s at %.3f price/u -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], nb * self.curPrice[marketplace]))
+
             #can't check if transaction is validate
             self.__dict__[marketplace] += nb
             self.money -= price
+            print ("cur money = %.3f" % self.money)
 
     def sell(self, nb, marketplace):
         price = self.getPrice(nb, marketplace)
         if self.__dict__[marketplace] >= nb:
+            print ("---Selling---")
+
             print("SELL:%d:%s" % (nb, marketplace), flush=True)
+
+            print ("sell %d %s at %.3f price/u -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], nb * self.curPrice[marketplace]))
+
             #can't check if transaction is validate
             self.__dict__[marketplace] -= nb
             self.money += price
+            print ("cur money = %.3f" % self.money)
 
     def sellAll(self, marketplace):
         if self.__dict__[marketplace] != 0:
@@ -103,7 +115,7 @@ class trader:
             #sinon si le marché est en bas dans les bandes de bollinger, j'achète des actions si attractiveness est inférieur à buyLimit
             elif attractiveness < self.buyLimit:
                 ratios[marketplace] = attractiveness
-            print ("curstate for %s is %.3f, risk = %.3f so attractiveness = %.3f " % (marketplace, curstate, risk, attractiveness))
+            #print ("curstate for %s is %.3f, risk = %.3f so attractiveness = %.3f " % (marketplace, curstate, risk, attractiveness))
 
         #softmax the list
         keys = []
