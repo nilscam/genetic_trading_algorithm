@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
+from utils import *
 import sys
 import os
 import math
 import numpy as np
+import time
 
 BRANGE = 100
 marketplace_list = ['crypto', 'raw_material', 'stock_exchange', 'forex']
@@ -14,6 +16,8 @@ class puller:
 
     def __init__(self, mode):
         self.mode = mode
+        self.index_db = "../push_index/.index.db"
+        self._cached_stamp = os.stat(self.index_db).st_mtime
 
     def getInputTest(self):
         lines = []
@@ -26,12 +30,30 @@ class puller:
                 i += 1
         return lines
 
+    def getInputProd(self):
+        lines = []
+        path = self.index_db
+        try:
+            os.mkfifo(path)
+        except OSError:
+            pass
+
+        my_value = -1
+        fifo = open(path, "r")
+
+        for line in fifo:
+            lines.append(lines)
+        fifo.close()
+        return lines
+
     def getValueTest(self, lines, marketplace):
         my_value = -1
         for line in lines:
             if (line.split(':')[0] == marketplace):
                 my_value = float(line.split(':')[1])
                 break
+        eprint(os.stat(self.index_db).st_mtime)
+        eprint("value standart input = %.3f, value index_db = %.3f" % (my_value, GetValue(marketplace)))
         return my_value
 
     def refreshDataTest(self):
@@ -40,7 +62,7 @@ class puller:
         return dict(zip(marketplace_list, values))
 
     def getValueProd(self, marketplace):
-        path = "../push_index/.index.db"
+        path = self.index_db
         try:
             os.mkfifo(path)
         except OSError:
@@ -60,7 +82,20 @@ class puller:
         values = [self.getValueProd(x) for x in marketplace_list]
         return dict(zip(marketplace_list, values))
 
+    def wait_refresh(self):
+        stamp = os.stat(self.index_db).st_mtime
+        timeout = time.time() + 1
+        while stamp == self._cached_stamp:
+            stamp = os.stat(self.index_db).st_mtime
+            if time.time() > timeout:
+                return 1
+        self._cached_stamp = stamp
+        return 0
+
     def pull(self):
+        if self.wait_refresh():
+            return {'crypto': -1}
+        time.sleep(0.01)
         if (self.mode == "test"):
             return self.refreshDataTest()
         else:

@@ -2,6 +2,7 @@
 #-*- coding: utf-8 -*-
 
 from bollinger import *
+from utils import *
 import sys
 import math
 
@@ -14,6 +15,8 @@ class wallet:
         self.forex = 0
         self.stock_exchange = 0
         self.curPrice = {}
+        self.buyOrder = {'crypto': 0, 'forex': 0, 'raw_material': 0, 'stock_exchange': 0}
+        self.sellOrder = {'crypto': 0, 'forex': 0, 'raw_material': 0, 'stock_exchange': 0}
 
     def __str__(self):
         print("---Wallet:---")
@@ -31,36 +34,47 @@ class wallet:
         return nb * self.curPrice[marketplace]
 
     def buy(self, nb, marketplace):
+        if nb == 0:
+            return
         price = self.getPrice(nb, marketplace)
         if price <= self.money:
-            print ("---Buying---")
-
+            eprint("buy %d %s at %.3f price/u on standart input, %.3f in .index_db file -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], GetValue(marketplace), nb * self.curPrice[marketplace]))
             print("BUY:%d:%s" % (nb, marketplace), flush=True)
-
-            print ("sell %d %s at %.3f price/u -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], nb * self.curPrice[marketplace]))
-
             #can't check if transaction is validate
             self.__dict__[marketplace] += nb
             self.money -= price
-            print ("cur money = %.3f" % self.money)
 
     def sell(self, nb, marketplace):
+        if nb == 0:
+            return
         price = self.getPrice(nb, marketplace)
         if self.__dict__[marketplace] >= nb:
-            print ("---Selling---")
-
             print("SELL:%d:%s" % (nb, marketplace), flush=True)
-
-            print ("sell %d %s at %.3f price/u -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], nb * self.curPrice[marketplace]))
-
+            eprint ("sell %d %s at %.3f price/u on standart input, %.3f in .index_db file -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], GetValue(marketplace), nb * self.curPrice[marketplace]))
             #can't check if transaction is validate
             self.__dict__[marketplace] -= nb
             self.money += price
-            print ("cur money = %.3f" % self.money)
+
+    def placeBuyOrder(self, nb, marketplace):
+        self.buyOrder[marketplace] += nb
+        print("BUY:%d:%s" % (nb, marketplace), flush=True)
+
+    def placeSellOrder(self, nb, marketplace):
+        self.sellOrder[marketplace] += nb
+        print("SELL:%d:%s" % (nb, marketplace), flush=True)
+
+    def executeOrders(self):
+        for marketplace, number in self.buyOrder.items():
+            self.buy(number, marketplace)
+            self.buyOrder[marketplace] = 0
+        for marketplace, number in self.sellOrder.items():
+            self.sell(number, marketplace)
+            self.sellOrder[marketplace] = 0
 
     def sellAll(self, marketplace):
         if self.__dict__[marketplace] != 0:
-            self.sell(self.__dict__[marketplace], marketplace)
+            #self.placeSellOrder(self.__dict__[marketplace], marketplace) # for put local in same env than server
+            self.sell(self.__dict__[marketplace], marketplace) # for server
 
     # buy as many shares as possible for this price rounded up
     def buyFor(self, maxMoney, marketplace):
@@ -70,7 +84,8 @@ class wallet:
             nb = math.ceil(maxMoney / self.curPrice[marketplace])
             if not nb == 1:
                 nb -= 1
-            self.buy(nb, marketplace)
+            #self.placeBuyOrder(nb, marketplace) # for put local in same env than server
+            self.buy(nb, marketplace) # for server
 
 
 class trader:
@@ -100,7 +115,7 @@ class trader:
             marketstate = self.bollinger.process(marketplace)
 
             #volatilité actuelle du marché (0 / 1)
-            risk = self.bollinger.calcCurRisk(marketstate['bmin'], marketstate['bmax'])
+            risk = self.bollinger.calcCurRisk(marketstate['bmin'], marketstate['bmax']) # multiplié par self.risk pour augmenter la tendance à jouer sur des marchés volatiles
 
             #etat de la valeur du marché actuelle par rapport aux coubres de bollinger (-1 / 1)
             curstate = self.bollinger.findCur(self.wallet.getPrice(1, marketplace), marketstate['bands'])
@@ -142,6 +157,7 @@ class trader:
         if curState['crypto'] == -1:
             return 0
         self.wallet.setCurPrice(curState)
+        self.wallet.executeOrders()
         return 1
 
 
@@ -150,9 +166,15 @@ def algo(mode):
 
     while t.update():
         t.runCycle()
-    print(t.wallet)
+    eprint('---Local---')
+    eprint(t.wallet)
     t.wallet.sellAll('crypto')
     t.wallet.sellAll('forex')
     t.wallet.sellAll('raw_material')
     t.wallet.sellAll('stock_exchange')
-    print(t.wallet)
+    t.wallet.executeOrders() # apply order placed before
+    eprint(t.wallet)
+    eprint('---Server---')
+    sys.stdout.write("EXIT\n")
+    sys.stdout.flush()
+    eprint('------------')
