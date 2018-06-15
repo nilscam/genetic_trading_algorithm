@@ -16,10 +16,10 @@ def GetValue(marketplace):
         os.mkfifo(path)
     except OSError:
         pass
-    
+
     my_value = -1
     fifo = open(path, "r")
-    
+
     for line in fifo:
         if (line.split(':')[0] == marketplace):
             my_value = float(line.split(':')[1])
@@ -32,11 +32,13 @@ def main():
                 algo("test")
         else:
                 algo("prod")
+
+        #display earned money and leave
         sys.stdout.write("STATS\n")
         sys.stdout.flush()
         sys.stdout.write("EXIT\n")
         sys.stdout.flush()
-        
-        
+
+
 if (__name__ == '__main__'):
     main()

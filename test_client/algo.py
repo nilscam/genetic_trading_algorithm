@@ -15,6 +15,15 @@ class wallet:
         self.stock_exchange = 0
         self.curPrice = {}
 
+    def __str__(self):
+        print("---Wallet:---")
+        print("Money: %d" % (self.money))
+        print("crypto: %d, estimated at %.3f" % (self.crypto, self.curPrice['crypto']))
+        print("raw_material: %d, estimated at %.3f" % (self.raw_material, self.curPrice['raw_material']))
+        print("forex: %d, estimated at %.3f" % (self.forex, self.curPrice['forex']))
+        print("stock_exchange: %d, estimated at %.3f" % (self.stock_exchange, self.curPrice['stock_exchange']))
+        return ("-------------")
+
     def setCurPrice(self, curPrice):
         self.curPrice = curPrice
 
@@ -38,7 +47,8 @@ class wallet:
             self.money += price
 
     def sellAll(self, marketplace):
-        self.sell(self.__dict__[marketplace], marketplace)
+        if self.__dict__[marketplace] != 0:
+            self.sell(self.__dict__[marketplace], marketplace)
 
     # buy as many shares as possible for this price rounded up
     def buyFor(self, maxMoney, marketplace):
@@ -68,7 +78,7 @@ class trader:
         self.sellLimit = sellLimit
         self.wallet = wallet(mode)
         self.bollinger = bollinger(mode, delta, size)
-        self.watch(size)
+        self.watch(int(size / 2 + 1))
 
     def runCycle(self):
         ratios = {}
@@ -78,35 +88,35 @@ class trader:
             marketstate = self.bollinger.process(marketplace)
 
             #volatilité actuelle du marché (0 / 1)
-            risk = self.bollinger.calcCurRisk(marketstate.bmin, marketstate.bmax)
+            risk = self.bollinger.calcCurRisk(marketstate['bmin'], marketstate['bmax'])
 
             #etat de la valeur du marché actuelle par rapport aux coubres de bollinger (-1 / 1)
-            curstate = self.bollinger.findCur(self.wallet.getPrice(1, marketplace), marketstate.bands)
+            curstate = self.bollinger.findCur(self.wallet.getPrice(1, marketplace), marketstate['bands'])
 
             # interet que l'algo doit porter à ce marché
             attractiveness = self.bollinger.smoothing(risk * curstate)
 
             #si le marché est haut dans les bandes de bollinger, je vend mes actions si attractiveness est supérieur à sellLimit
             if attractiveness > 0:
-                if attractiveness > sellLimit:
+                if attractiveness > self.sellLimit:
                     self.wallet.sellAll(marketplace)
             #sinon si le marché est en bas dans les bandes de bollinger, j'achète des actions si attractiveness est inférieur à buyLimit
-            elif
-                ratio[marketplace] = attractiveness
+            elif attractiveness < self.buyLimit:
+                ratios[marketplace] = attractiveness
 
         #softmax the list
         keys = []
         values = []
-        for key, value in ratios.iteritems():
-            if value < buyLimit:
+        for key, value in ratios.items():
+            if value < self.buyLimit:
                 keys.append(key)
                 values.append(value)
 
         #buy actions
         if values:
             betRatios = dict(zip(keys, self.bollinger.softmax(values)))
-            toBet = self.wallet.money / self.bet
-            for key, value in betRatios.iteritems():
+            toBet = self.wallet.money * self.bet
+            for key, value in betRatios.items():
                 self.wallet.buyFor(toBet / value, key)
 
 
@@ -115,16 +125,21 @@ class trader:
             self.update()
 
     def update(self):
-        self.wallet.setCurPrice(self.bollinger.pull())
+        curState = self.bollinger.pull()
+        if curState['crypto'] == -1:
+            return 0
+        self.wallet.setCurPrice(curState)
+        return 1
 
 
 def algo(mode):
-    #init variables
-    w = wallet(mode)
-    b = bollinger()
-    b.feed(w.curPrice)
+    t = trader(mode)
 
-    #loop algo
-    while not -1 in w.curPrice.values():
-        print(b.process('crypto'))
-        update(w, b)
+    while t.update():
+        t.runCycle()
+    print(t.wallet)
+    t.wallet.sellAll('crypto')
+    t.wallet.sellAll('forex')
+    t.wallet.sellAll('raw_material')
+    t.wallet.sellAll('stock_exchange')
+    print(t.wallet)

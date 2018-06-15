@@ -36,8 +36,8 @@ class puller:
 
     def refreshDataTest(self):
         my_data = self.getInputTest()
-        values = [self.getValueTest(my_data, x) for x in puller.marketplace_list]
-        return dict(zip(puller.marketplace_list, values))
+        values = [self.getValueTest(my_data, x) for x in marketplace_list]
+        return dict(zip(marketplace_list, values))
 
     def getValueProd(self, marketplace):
         path = "../push_index/.index.db"
@@ -57,8 +57,8 @@ class puller:
         return my_value
 
     def refreshDataProd(self):
-        values = [self.getValueProd(x) for x in puller.marketplace_list]
-        return dict(zip(puller.marketplace_list, values))
+        values = [self.getValueProd(x) for x in marketplace_list]
+        return dict(zip(marketplace_list, values))
 
     def pull(self):
         if (self.mode == "test"):
