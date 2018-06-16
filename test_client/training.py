@@ -20,7 +20,7 @@ class genetic:
 
     # à chaque epoch :
     # ajouter un individu full random pour ne pas faire converger la population
-    list_genes = [[0, 5], [0, 100], [0, 1], [0, 1], [0, 1], [-1, 1]]
+    list_genes = [[0, 5], [0, 100], [0, 1], [0, 1], [-1, 1], [-1, 1]]
 
     def __init__(self, populationSize = 20):
         if populationSize < 5:
@@ -102,7 +102,7 @@ class genetic:
         population = self.generatePopulation()
         bestScore = 0
         bestGenes = []
-        for x in range(300):
+        for x in range(100):
             print("---<Generation %d>---" % x)
             print("current best score is %.3f" % bestScore)
 
@@ -137,7 +137,7 @@ def main():
         money = t.wallet.money
         print (money)
         return
-    population = genetic(10)
+    population = genetic(20)
     population.run()
 
 if (__name__ == '__main__'):

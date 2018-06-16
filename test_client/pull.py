@@ -11,10 +11,9 @@ marketplace_list = ['crypto', 'raw_material', 'stock_exchange', 'forex']
 class puller:
     # mode can be "prod" or "test"
 
-    def __init__(self, mode = "prod", path = "./indexes2/", maxEpoch = 160):
+    def __init__(self, mode = "prod", path = "./indexes/", maxEpoch = 160):
         self.mode = mode
-        self.index_db = "../push_index/.index.db"
-        self._cached_stamp = os.stat(self.index_db).st_mtime
+        #self.index_db = "../push_index/.index.db"
         self.index = 0
         self.maxEpoch = maxEpoch
         self.data_set = {'crypto': [], 'forex': [], 'raw_material': [], 'stock_exchange': []}
@@ -32,17 +31,6 @@ class puller:
             except:
                 eprint("Can't open and read file")
                 raise
-
-    def getInputTest(self):
-        lines = []
-        i = 0
-        for line in sys.stdin:
-            if i > 3:
-                break;
-            else:
-                lines.append(line)
-                i += 1
-        return lines
 
     def getValueTest(self, lines, marketplace):
         my_value = -1
@@ -70,7 +58,7 @@ class puller:
         return my_value
 
     def refreshDataTest(self):
-        my_data = self.getInputTest()
+        my_data = [sys.stdin.readline() for i in range(4)]
         values = [self.getValueTest(my_data, x) for x in marketplace_list]
         return dict(zip(marketplace_list, values))
 
@@ -87,21 +75,7 @@ class puller:
         self.index += 1
         return values
 
-    def wait_refresh(self):
-        stamp = os.stat(self.index_db).st_mtime
-        timeout = time.time() + 1
-        while stamp == self._cached_stamp:
-            stamp = os.stat(self.index_db).st_mtime
-            if time.time() > timeout:
-                return 1
-        self._cached_stamp = stamp
-        return 0
-
     def pull(self):
-        if self.mode != "train":
-            if self.wait_refresh():
-                return {'crypto': -1}
-            time.sleep(0.02)
         if self.mode == "train":
             return self.refreshTrainData()
         elif (self.mode == "test"):

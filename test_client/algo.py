@@ -8,7 +8,7 @@ import sys
 
 class trader:
 
-    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.5, buyLimit = -0.5, sellLimit = 0.5):
+    def __init__(self, mode = "prod", delta = 4.898800390650705, size = 13, risk = 0.9432979912924092, bet = 0.9976807618992833, buyLimit = 0.9838575642658014, sellLimit = 0.9934152010364605):
         self.risk = risk
         self.bet = bet
         self.buyLimit = buyLimit
@@ -72,7 +72,8 @@ class trader:
 
 
 def algo(mode):
-    t = trader(mode)
+    # 153 412
+    t = trader(mode, *([1.6410694649597652, 80, 0.9975905442330391, 0.02758123838569393, 0.9908648350307403, 0.37539931496677914]))
 
     while t.update():
         t.runCycle()
