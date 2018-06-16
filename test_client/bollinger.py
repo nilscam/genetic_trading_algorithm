@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-from pull import *
-from utils import *
+try:
+    from utils import *
+    from pull import *
+except:
+    from .pull import *
+    from .utils import *
 import math
 import numpy as np
 

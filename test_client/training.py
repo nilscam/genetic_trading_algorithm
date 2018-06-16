@@ -15,8 +15,8 @@ class genetic:
     # size (0 / 100)
     # multiplicateur de volatilité (0 / 1)
     # mise par tour de jeu (0 / 1)
-    # seuil d'achat (0 / 1)
-    # seuil de vente (-1 / 0)
+    # seuil d'achat (-1 / 1)
+    # seuil de vente (-1 / 1)
 
     # à chaque epoch :
     # ajouter un individu full random pour ne pas faire converger la population
@@ -138,7 +138,7 @@ def main():
         money = t.wallet.money
         print (money)
         return
-    population = genetic(50)
+    population = genetic(20)
     population.run()
 
 if (__name__ == '__main__'):

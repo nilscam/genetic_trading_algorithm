@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-from wallet import *
-from bollinger import *
-from utils import *
+try:
+    from wallet import *
+    from bollinger import *
+    from utils import *
+except:
+    from .wallet import *
+    from .bollinger import *
+    from .utils import *
+
 import sys
 
 class trader:
 
-    def __init__(self, mode = "prod", delta = 4.898800390650705, size = 13, risk = 0.9432979912924092, bet = 0.9976807618992833, buyLimit = 0.9838575642658014, sellLimit = 0.9934152010364605):
+    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.5, buyLimit = 0.5, sellLimit = 0.5):
         self.risk = risk
         self.bet = bet
         self.buyLimit = buyLimit
@@ -76,7 +82,12 @@ def algo(mode):
     #t = trader(mode, *([1.6410694649597652, 80, 0.9975905442330391, 0.02758123838569393, 0.9908648350307403, 0.37539931496677914]))
 
     # 267 669
-    t = trader(mode, *([2.5549499263635695, 95, 0.9973661444332922, 0.9972612298137682, -0.3134370664919579, 0.3707476541173418]))
+    #t = trader(mode, *([2.5549499263635695, 95, 0.9973661444332922, 0.9972612298137682, -0.3134370664919579, 0.3707476541173418]))
+
+    # 527 793
+    # t = trader(mode, *([4.996287266643122, 74, 0.9970885632936157, 0.9988256445383916, -0.26962819438164254, 0.2984888872850986]))
+
+    t = trader(mode, *([4.568550956536216, 95, 0.9707551498268774, 0.9914757981519937, -0.228886578491877, 0.19344993064699723]))
 
     while t.update():
         t.runCycle()

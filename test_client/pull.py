@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-from utils import *
+try:
+    from utils import *
+except:
+    from .utils import *
 import sys
 import os
 import time
@@ -11,7 +14,7 @@ marketplace_list = ['crypto', 'raw_material', 'stock_exchange', 'forex']
 class puller:
     # mode can be "prod" or "test"
 
-    def __init__(self, mode = "prod", path = "./indexes/", maxEpoch = 160):
+    def __init__(self, mode = "prod", path = "./indexes/", maxEpoch = 360):
         self.mode = mode
         #self.index_db = "../push_index/.index.db"
         self.index = 0

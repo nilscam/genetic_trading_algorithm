@@ -2,7 +2,10 @@
 #-*- coding: utf-8 -*-
 
 import math
-from utils import *
+try:
+    from utils import *
+except:
+    from .utils import *
 
 class wallet:
 
@@ -24,7 +27,7 @@ class wallet:
         eprint("raw_material: %d, estimated at %.3f" % (self.raw_material, self.curPrice['raw_material']))
         eprint("forex: %d, estimated at %.3f" % (self.forex, self.curPrice['forex']))
         eprint("stock_exchange: %d, estimated at %.3f" % (self.stock_exchange, self.curPrice['stock_exchange']))
-        return ("-------------")
+        return ("------------")
 
     def setCurPrice(self, curPrice):
         self.curPrice = curPrice
