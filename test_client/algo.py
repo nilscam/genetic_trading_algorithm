@@ -1,104 +1,14 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
+from wallet import *
 from bollinger import *
 from utils import *
 import sys
-import math
-
-class wallet:
-
-    def __init__(self, mode):
-        self.money = 10000
-        self.crypto = 0
-        self.raw_material = 0
-        self.forex = 0
-        self.stock_exchange = 0
-        self.curPrice = {}
-        self.buyOrder = {'crypto': 0, 'forex': 0, 'raw_material': 0, 'stock_exchange': 0}
-        self.sellOrder = {'crypto': 0, 'forex': 0, 'raw_material': 0, 'stock_exchange': 0}
-
-    def __str__(self):
-        print("---Wallet:---")
-        print("Money: %.3f" % (self.money))
-        print("crypto: %d, estimated at %.3f" % (self.crypto, self.curPrice['crypto']))
-        print("raw_material: %d, estimated at %.3f" % (self.raw_material, self.curPrice['raw_material']))
-        print("forex: %d, estimated at %.3f" % (self.forex, self.curPrice['forex']))
-        print("stock_exchange: %d, estimated at %.3f" % (self.stock_exchange, self.curPrice['stock_exchange']))
-        return ("-------------")
-
-    def setCurPrice(self, curPrice):
-        self.curPrice = curPrice
-
-    def getPrice(self, nb, marketplace):
-        return nb * self.curPrice[marketplace]
-
-    def buy(self, nb, marketplace):
-        if nb == 0:
-            return
-        price = self.getPrice(nb, marketplace)
-        if price <= self.money:
-            eprint("buy %d %s at %.3f price/u on standart input, %.3f in .index_db file -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], GetValue(marketplace), nb * self.curPrice[marketplace]))
-            print("BUY:%d:%s" % (nb, marketplace), flush=True)
-            #can't check if transaction is validate
-            self.__dict__[marketplace] += nb
-            self.money -= price
-
-    def sell(self, nb, marketplace):
-        if nb == 0:
-            return
-        price = self.getPrice(nb, marketplace)
-        if self.__dict__[marketplace] >= nb:
-            print("SELL:%d:%s" % (nb, marketplace), flush=True)
-            eprint ("sell %d %s at %.3f price/u on standart input, %.3f in .index_db file -> total cost = %.3f" % (nb, marketplace, self.curPrice[marketplace], GetValue(marketplace), nb * self.curPrice[marketplace]))
-            #can't check if transaction is validate
-            self.__dict__[marketplace] -= nb
-            self.money += price
-
-    def placeBuyOrder(self, nb, marketplace):
-        self.buyOrder[marketplace] += nb
-        print("BUY:%d:%s" % (nb, marketplace), flush=True)
-
-    def placeSellOrder(self, nb, marketplace):
-        self.sellOrder[marketplace] += nb
-        print("SELL:%d:%s" % (nb, marketplace), flush=True)
-
-    def executeOrders(self):
-        for marketplace, number in self.buyOrder.items():
-            self.buy(number, marketplace)
-            self.buyOrder[marketplace] = 0
-        for marketplace, number in self.sellOrder.items():
-            self.sell(number, marketplace)
-            self.sellOrder[marketplace] = 0
-
-    def sellAll(self, marketplace):
-        if self.__dict__[marketplace] != 0:
-            #self.placeSellOrder(self.__dict__[marketplace], marketplace) # for put local in same env than server
-            self.sell(self.__dict__[marketplace], marketplace) # for server
-
-    # buy as many shares as possible for this price rounded up
-    def buyFor(self, maxMoney, marketplace):
-        if self.curPrice[marketplace] <= self.money:
-            if maxMoney > self.money:
-                maxMoney = self.money
-            nb = math.ceil(maxMoney / self.curPrice[marketplace])
-            if not nb == 1:
-                nb -= 1
-            #self.placeBuyOrder(nb, marketplace) # for put local in same env than server
-            self.buy(nb, marketplace) # for server
-
 
 class trader:
 
-    #genes d'un trader:
-    # delta (0 / 5)
-    # size (0 / 100)
-    # multiplicateur de volatilité (0 / 1)
-    # mise par tour de jeu (0 / 1)
-    # seuil d'achat (0 / 1)
-    # seuil de vente (-1 / 0)
-
-    def __init__(self, mode = "prod", delta = 2, size = 20, risk = 0.5, bet = 0.5, buyLimit = -0.5, sellLimit = 0.5):
+    def __init__(self, mode = "prod", delta = 4.898800390650705, size = 13, risk = 0.9432979912924092, bet = 0.9976807618992833, buyLimit = 0.9838575642658014, sellLimit = 0.9934152010364605):
         self.risk = risk
         self.bet = bet
         self.buyLimit = buyLimit
@@ -154,7 +64,6 @@ class trader:
 
     def update(self):
         curState = self.bollinger.pull()
-        eprint(curState)
         if curState['crypto'] == -1:
             return 0
         self.wallet.setCurPrice(curState)
@@ -163,7 +72,11 @@ class trader:
 
 
 def algo(mode):
-    t = trader(mode)
+    # 153 412
+    #t = trader(mode, *([1.6410694649597652, 80, 0.9975905442330391, 0.02758123838569393, 0.9908648350307403, 0.37539931496677914]))
+
+    # 267 669
+    t = trader(mode, *([2.5549499263635695, 95, 0.9973661444332922, 0.9972612298137682, -0.3134370664919579, 0.3707476541173418]))
 
     while t.update():
         t.runCycle()
