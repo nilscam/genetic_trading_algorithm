@@ -102,9 +102,10 @@ class genetic:
         population = self.generatePopulation()
         bestScore = 0
         bestGenes = []
-        for x in range(100):
+        for x in range(5000):
             print("---<Generation %d>---" % x)
-            print("current best score is %.3f" % bestScore)
+            print("current best score is %.3f, genes are :" % bestScore)
+            print(bestGenes)
 
             #simulate all genes
             results = []
@@ -137,7 +138,7 @@ def main():
         money = t.wallet.money
         print (money)
         return
-    population = genetic(20)
+    population = genetic(50)
     population.run()
 
 if (__name__ == '__main__'):
