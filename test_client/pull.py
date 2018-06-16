@@ -11,7 +11,7 @@ marketplace_list = ['crypto', 'raw_material', 'stock_exchange', 'forex']
 class puller:
     # mode can be "prod" or "test"
 
-    def __init__(self, mode = "prod", path = "./indexes/", maxEpoch = 360):
+    def __init__(self, mode = "prod", path = "./indexes2/", maxEpoch = 160):
         self.mode = mode
         self.index_db = "../push_index/.index.db"
         self._cached_stamp = os.stat(self.index_db).st_mtime

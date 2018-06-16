@@ -53,7 +53,7 @@ class genetic:
         for x in range(2):
             for i in range(len(self.list_genes)):
                 #mutation pop 5% chance
-                if randint(0,100) < 5:
+                if randint(0,100) < 10:
                     mutation = self.genPropety(self.list_genes[i])
                     childs[x].append(mutation)
                 else:
@@ -102,7 +102,7 @@ class genetic:
         population = self.generatePopulation()
         bestScore = 0
         bestGenes = []
-        for x in range(100):
+        for x in range(300):
             print("---<Generation %d>---" % x)
             print("current best score is %.3f" % bestScore)
 
@@ -124,7 +124,20 @@ class genetic:
         print (bestGenes)
 
 def main():
-    population = genetic(20)
+    if len(sys.argv) == 8 and sys.argv[1] == "test":
+        genes = [float(i) for i in sys.argv[2:]]
+        genes[1] = int(genes[1])
+        t = trader("train", *(genes))
+        while t.update():
+            t.runCycle()
+        t.wallet.sellAll('crypto')
+        t.wallet.sellAll('forex')
+        t.wallet.sellAll('raw_material')
+        t.wallet.sellAll('stock_exchange')
+        money = t.wallet.money
+        print (money)
+        return
+    population = genetic(10)
     population.run()
 
 if (__name__ == '__main__'):
